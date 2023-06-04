@@ -8,8 +8,7 @@ import pygame
 # sys.path.append(
 #     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 # )
-# from mutils import convert
-from .mutils import convert
+from mutils import convert
 
 MODEL_NAME = "Score"
 FPS = 10
