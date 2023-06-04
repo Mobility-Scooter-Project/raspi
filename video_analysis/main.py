@@ -10,9 +10,10 @@ import pygame
 # )
 from mutils import convert
 
-MODEL_NAME = "Score"
+MODEL_NAME = "Front"
 FPS = 10
-TIMESTAMPS = 16
+TIMESTAMPS = 5
+WINDOW_NAME = "Motion Analysis"
 
 '''
 * store fixed number of items 
@@ -46,14 +47,13 @@ class ImageDisplay:
         return self
 
     def show(self):
-        cv2.imshow("Motion Analysis", cv2.flip(self.image, 1))
+        cv2.imshow(WINDOW_NAME, cv2.flip(self.image, 1))
         cv2.waitKey(1)
     
     # takes POSE.process(...).pose_landmarks
     def draw_landmark(self, landmarks):
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         self.mp_drawing.draw_landmarks(
-            image,
+            self.image,
             landmarks,
             self.mp_pose.POSE_CONNECTIONS,
             landmark_drawing_spec=self.mp_drawing_styles.get_default_pose_landmarks_style(),
@@ -69,7 +69,7 @@ class ImageDisplay:
 
 
 def main():
-    model = tf.keras.models.load_model(os.path.join("model", MODEL_NAME))
+    model = tf.keras.models.load_model(os.path.join("model", MODEL_NAME, "model.h5"))
     def process_poses(poses):
         outputs = model.predict(np.array([poses]), verbose=0)
         print(outputs)
@@ -97,8 +97,12 @@ def main():
             pose_landmarks = process_image(image)
             display.set(image).draw_landmark(pose_landmarks).draw_curve().show()
             delta_time = clock.tick(FPS)
-    except:
-        pass
+            print(cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_VISIBLE))
+            if cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_VISIBLE) < 1:
+                break
+
+    except Exception as e:
+        print(e)
 
     cap.release()
     pose.close()
