@@ -73,8 +73,8 @@ class ImageDisplay:
 
     def draw_info_text(self, image):
         w = len(image[0])
-        image = cv2.putText(image, 'Stable', (w-100,32), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1, cv2.LINE_AA)
-        return cv2.putText(image, 'Unstable', (w-100,64), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1, cv2.LINE_AA)
+        image = cv2.putText(image, 'Stable', (w-80,34), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1, cv2.LINE_AA)
+        return cv2.putText(image, 'Unstable', (w-80,68), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1, cv2.LINE_AA)
 
 def main():
     display = ImageDisplay()
