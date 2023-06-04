@@ -71,6 +71,7 @@ class ImageDisplay:
 def main():
     model = tf.keras.models.load_model(os.path.join("model", MODEL_NAME, "model.h5"))
     def process_poses(poses):
+        # TODO: create graph with draw_curve in ImageDisplay
         outputs = model.predict(np.array([poses]), verbose=0)
         print(outputs)
 
@@ -97,7 +98,6 @@ def main():
             pose_landmarks = process_image(image)
             display.set(image).draw_landmark(pose_landmarks).draw_curve().show()
             delta_time = clock.tick(FPS)
-            print(cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_VISIBLE))
             if cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_VISIBLE) < 1:
                 break
 
