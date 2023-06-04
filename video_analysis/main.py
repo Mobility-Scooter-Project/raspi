@@ -4,12 +4,12 @@ import mediapipe as mp
 import numpy as np
 import tensorflow as tf
 import pygame
-import sys
-
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
-)
-from mutils import convert
+# import sys
+# sys.path.append(
+#     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+# )
+# from mutils import convert
+from .mutils import convert
 
 MODEL_NAME = "Score"
 FPS = 10
@@ -100,6 +100,9 @@ def main():
             delta_time = clock.tick(FPS)
     except:
         pass
-        
+
     cap.release()
     pose.close()
+
+if __name__=='__main__':
+    main()
