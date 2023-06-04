@@ -9,40 +9,97 @@ import sys
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 )
-from mutils import convert, offset, Preprocessor
+from mutils import convert
 
 MODEL_NAME = "Score"
 FPS = 10
 TIMESTAMPS = 16
 
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
-mp_pose = mp.solutions.pose
+'''
+* store fixed number of items 
+* trigger callback with the max capacity
+* clear them after callback
+'''
+class ItemBuffer:
+    def __init__(self, limit, callback):
+        self.buffer = []
+        self.limit = limit
+        self.callback = callback
+    
+    def add(self, item):
+        self.buffer.append(item)
+        if self.limit == len(self.buffer):
+            self.callback(self.buffer)
+            self.buffer.clear()
 
-clock = pygame.time.Clock()
+'''
+display image with extra drawing functions
+'''
+class ImageDisplay:
+    def __init__(self):
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.mp_drawing_styles = mp.solutions.drawing_styles
+        self.mp_pose = mp.solutions.pose
+        self.image = None
 
-MODEL = tf.keras.models.load_model(os.path.join("model", MODEL_NAME))
-input_buffer = []
+    def set(self, image):
+        self.image = image
+        return self
 
-cap = cv2.VideoCapture(0)
+    def show(self):
+        cv2.imshow("Motion Analysis", cv2.flip(self.image, 1))
+        cv2.waitKey(1)
+    
+    # takes POSE.process(...).pose_landmarks
+    def draw_landmark(self, landmarks):
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        self.mp_drawing.draw_landmarks(
+            image,
+            landmarks,
+            self.mp_pose.POSE_CONNECTIONS,
+            landmark_drawing_spec=self.mp_drawing_styles.get_default_pose_landmarks_style(),
+        )
+        return self
 
-preprocessor = Preprocessor()
+    # custom curve on the image
+    def draw_curve(self):
+        pts = np.array([[10,5],[20,30],[70,20],[50,10]], np.int32)
+        pts = pts.reshape((-1,1,2))
+        cv2.polylines(self.image,[pts],False,(0,255,255))
+        return self
 
-def process(pose_model, image):
-    results = pose_model.process(image)
-    if results.pose_landmarks is not None:
-        converted_landmarks = convert(results.pose_world_landmarks.landmark)
-        if previous_landmarks is None:
-            previous_landmarks = converted_landmarks
-        else:
-            offset_landmarks = offset(converted_landmarks, previous_landmarks)
-            previous_landmarks = converted_landmarks
-            input_buffer.append(offset_landmarks)
-            if len(input_buffer) >= TIMESTAMPS:
-                inputs = np.array([preprocessor.transform(np.array(input_buffer))])
-                outputs = MODEL.predict(inputs, verbose=0)
-                print(outputs)
-                # print([LABELS[next(filter(lambda x: x[1]==max(output), enumerate(output)))[0]] for output in outputs])
-                input_buffer.clear()
-        landmark = results.pose_landmarks.landmark
-        # Draw the pose annotation on the image.
+
+def main():
+    model = tf.keras.models.load_model(os.path.join("model", MODEL_NAME))
+    def process_poses(poses):
+        outputs = model.predict(np.array([poses]), verbose=0)
+        print(outputs)
+
+    pose = mp.solutions.pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+    buffer = ItemBuffer(TIMESTAMPS, process_poses)
+    def process_image(image):
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image.flags.writeable = False
+        results = pose.process(image)
+        if results.pose_landmarks is not None:
+            converted_landmarks = convert(results.pose_world_landmarks.landmark)
+            buffer.add(converted_landmarks)
+        return results.pose_landmarks
+
+    display = ImageDisplay()
+    clock = pygame.time.Clock()
+    cap = cv2.VideoCapture(0)
+    try:
+        while cap.isOpened():
+            success, image = cap.read()
+            if not success:
+                print("Ignoring empty camera frame.")
+                continue
+            pose_landmarks = process_image(image)
+            display.set(image).draw_landmark(pose_landmarks).draw_curve().show()
+            delta_time = clock.tick(FPS)
+    except:
+        pass
+        
+    cap.release()
+    pose.close()
