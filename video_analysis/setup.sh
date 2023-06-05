@@ -1,6 +1,6 @@
 sudo apt update
 sudo apt-get install -y build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libffi-dev
-source ~/.bashrc
+source /home/pi/.bashrc
 conda create -n video python=3.7 -y
 conda activate video
 pip install -r requirements.txt
