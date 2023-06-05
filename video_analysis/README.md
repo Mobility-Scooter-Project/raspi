@@ -31,6 +31,12 @@ conda config --set auto_activate_base false
 ```
 ### Setup motion analysis script
 ```
+conda create -n video python=3.7 -y
+```
+```
+conda activate video
+```
+```
 git clone https://github.com/Mobility-Scooter-Project/raspi.git
 ```
 ```
