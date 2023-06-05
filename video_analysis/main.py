@@ -49,7 +49,7 @@ class ImageDisplay:
         return self
 
     def show(self):
-        cv2.imshow(WINDOW_NAME, self.draw_info_text(cv2.flip(self.image, 1)))
+        cv2.imshow(WINDOW_NAME, cv2.resize(self.draw_info_text(cv2.flip(self.image, 1)), (400,300), interpolation=cv2.INTER_AREA))
         cv2.waitKey(1)
     
     # takes POSE.process(...).pose_landmarks
