@@ -4,6 +4,9 @@
 
   ![image](https://github.com/Mobility-Scooter-Project/raspi/assets/44049919/1d3e82a4-1a8d-490a-8b6c-0a52fffda3e2)
 * [x] Raspberry Pi
+
+  <img width="1105" alt="Screen Shot 2023-06-05 at 5 06 34 PM" src="https://github.com/Mobility-Scooter-Project/raspi/assets/44049919/88ffc821-f309-43e2-87b7-ad11ee20e636">
+
 * put pretrained model in `/model` and change `MODEL_NAME` 
 
 ## SETUP
