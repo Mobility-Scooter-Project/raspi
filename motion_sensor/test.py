@@ -1,7 +1,3 @@
-# REU2022 mobility scooter work 
-# https://github.com/Mobility-Scooter-Project/NSFREU2022-Mobility-Scooter
-# Author: Marc Cruz
-
 from sense_hat import SenseHat, ACTION_PRESSED, ACTION_HELD, ACTION_RELEASED
 from datetime import datetime
 from csv import writer
@@ -59,7 +55,6 @@ def get_Data():
     s_data.append(gyro_z)
     
     s_data.append(datetime.now())
-    time.sleep(.5)
     return s_data
 
 
@@ -176,29 +171,35 @@ sense.stick.direction_down = pushed_down
 timestamp = datetime.now()
 timestart = datetime.now()
 
-with open(csvname, 'w', newline='') as f:
-    data_writer = writer(f)
-    data_writer.writerow(['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'datetime', 'elapsed'])
+for i in range(100):
+    start = time.time()
+    get_Data()
+    end = time.time()
+    print(end - start)
 
-    # Constantly uploading data until the raspberry pi is stopped.
-    while True:
-        try:
-            if logging:
-                    data = get_Data()
-                    dt = elapsed = data[-1] - timestart
-                    data.append(round(elapsed.total_seconds(), 1))
-                    data_writer.writerow(data)
-                    timestamp = datetime.now()
-                    size = os.path.getsize('/home/reu/Desktop/Code/{0}'.format(csvname))
-                    if size > 0:
-                        sense.set_pixels(purple)
-            if offSwitch:
-                logging = False
-                print("Switch | Closing File and saving data ...")
-                f.close()
-                break
-        except KeyboardInterrupt:
-            sense.set_pixels(red)
-            print("Key Interruption | Closing File and saving data ...")
-            f.close()
+# with open(csvname, 'w', newline='') as f:
+#     data_writer = writer(f)
+#     data_writer.writerow(['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'datetime', 'elapsed'])
+
+#     # Constantly uploading data until the raspberry pi is stopped.
+#     while True:
+#         try:
+#             if logging:
+#                     data = get_Data()
+#                     dt = elapsed = data[-1] - timestart
+#                     data.append(round(elapsed.total_seconds(), 1))
+#                     data_writer.writerow(data)
+#                     timestamp = datetime.now()
+#                     size = os.path.getsize('/home/reu/Desktop/Code/{0}'.format(csvname))
+#                     if size > 0:
+#                         sense.set_pixels(purple)
+#             if offSwitch:
+#                 logging = False
+#                 print("Switch | Closing File and saving data ...")
+#                 f.close()
+#                 break
+#         except KeyboardInterrupt:
+#             sense.set_pixels(red)
+#             print("Key Interruption | Closing File and saving data ...")
+#             f.close()
                 
