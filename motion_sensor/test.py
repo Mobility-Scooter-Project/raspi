@@ -5,8 +5,12 @@ import time
 import sys
 from time import sleep
 import os
+import cv2
+import pygame
 
-csvname = datetime.now().strftime("%d%b%Y_%H-%M-%S")+".csv"
+
+timestamp = datetime.now().strftime("%d%b%Y_%H-%M-%S")
+print(timestamp)
 
 sense = SenseHat()
 sense.set_imu_config(True, True, True)
@@ -139,14 +143,6 @@ yellow = [
     ]
 
 #This is the safety net that stops the code from running if there is already another csv file with the csv name.
-Check = os.path.exists(csvname)
-if Check:
-    print('Name already Exists')
-    sense.set_pixels(yellow)
-    exit()
-else:
-    print("Ready")
-    sense.set_pixels(blue)
 
 def pushed_up(event):
     global logging, timestart
@@ -168,38 +164,34 @@ sense.stick.direction_down = pushed_down
 #Added timestamp to do better labelling
 #Note: elapse time can start at random number sometimes. So it can start on the 1000 second or on the 20 second.
 #To fix this issue would match the elapse time with the corresponding helmet view recording.
-timestamp = datetime.now()
-timestart = datetime.now()
 
-for i in range(100):
-    start = time.time()
-    get_Data()
-    end = time.time()
-    print(end - start)
+print("Ready")
+sense.set_pixels(blue)
 
-# with open(csvname, 'w', newline='') as f:
-#     data_writer = writer(f)
-#     data_writer.writerow(['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'datetime', 'elapsed'])
+cap = cv2.VideoCapture(0)
+dimension = int(cap.get(3)), int(cap.get(4))
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+video_writer = cv2.VideoWriter(f'{timestamp}.mp4', fourcc, 5, dimension)
 
-#     # Constantly uploading data until the raspberry pi is stopped.
-#     while True:
-#         try:
-#             if logging:
-#                     data = get_Data()
-#                     dt = elapsed = data[-1] - timestart
-#                     data.append(round(elapsed.total_seconds(), 1))
-#                     data_writer.writerow(data)
-#                     timestamp = datetime.now()
-#                     size = os.path.getsize('/home/reu/Desktop/Code/{0}'.format(csvname))
-#                     if size > 0:
-#                         sense.set_pixels(purple)
-#             if offSwitch:
-#                 logging = False
-#                 print("Switch | Closing File and saving data ...")
-#                 f.close()
-#                 break
-#         except KeyboardInterrupt:
-#             sense.set_pixels(red)
-#             print("Key Interruption | Closing File and saving data ...")
-#             f.close()
-                
+clock = pygame.time.Clock()
+output_file = open(f'{timestamp}.csv', 'w', newline='')
+data_writer = writer(output_file)
+data_writer.writerow(['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'datetime', 'elapsed'])
+try:
+    for i in range(20):
+        data_writer.writerow(get_Data())
+        ret, frame = cap.read()
+        video_writer.write(frame)
+        cv2.waitKey(1)
+        delta_time = clock.tick(5)
+        print(delta_time)
+except Exception as e:
+    print(e)
+    
+
+
+cap.release()
+video_writer.release()
+output_file.close()
+
+

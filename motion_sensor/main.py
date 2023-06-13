@@ -59,7 +59,6 @@ def get_Data():
     s_data.append(gyro_z)
     
     s_data.append(datetime.now())
-    time.sleep(.5)
     return s_data
 
 
@@ -189,9 +188,7 @@ with open(csvname, 'w', newline='') as f:
                     data.append(round(elapsed.total_seconds(), 1))
                     data_writer.writerow(data)
                     timestamp = datetime.now()
-                    size = os.path.getsize('/home/reu/Desktop/Code/{0}'.format(csvname))
-                    if size > 0:
-                        sense.set_pixels(purple)
+                    sense.set_pixels(purple)
             if offSwitch:
                 logging = False
                 print("Switch | Closing File and saving data ...")
