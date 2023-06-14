@@ -171,20 +171,21 @@ sense.set_pixels(blue)
 cap = cv2.VideoCapture(0)
 dimension = int(cap.get(3)), int(cap.get(4))
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-video_writer = cv2.VideoWriter(f'{timestamp}.mp4', fourcc, 5, dimension)
+video_writer = cv2.VideoWriter(f'data/{timestamp}.mp4', fourcc, 5, dimension)
 
 clock = pygame.time.Clock()
-output_file = open(f'{timestamp}.csv', 'w', newline='')
+output_file = open(f'data/{timestamp}.csv', 'w', newline='')
 data_writer = writer(output_file)
 data_writer.writerow(['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'datetime', 'elapsed'])
+while not logging:
+    time.sleep(0.1)
 try:
-    for i in range(20):
+    while not offSwitch:
         data_writer.writerow(get_Data())
         ret, frame = cap.read()
         video_writer.write(frame)
         cv2.waitKey(1)
         delta_time = clock.tick(5)
-        print(delta_time)
 except Exception as e:
     print(e)
     
