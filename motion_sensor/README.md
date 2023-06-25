@@ -27,5 +27,5 @@
 dtoverlay=rpi-sense
 ```
 * the second problem is Fail to initialise TC34725 colour sensor.(sensor not present), this website teached how to fix it
-* https://forums.raspberrypi.com/viewtopic.php?t=338641
+* [https://forums.raspberrypi.com/viewtopic.php?t=338641](https://github.com/astro-pi/python-sense-hat/issues/125)https://github.com/astro-pi/python-sense-hat/issues/125
   
