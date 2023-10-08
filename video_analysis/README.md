@@ -27,7 +27,7 @@ chmod +x install.sh
 rm install.sh
 ```
 ```
-source ./bashrc
+source ~/.bashrc
 ```
 ```
 conda config --set auto_activate_base false
